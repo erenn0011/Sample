@@ -51,40 +51,28 @@
             }
         }
 
-        /// <summary>
-        /// Displays any generic string message in the top-right corner dynamically.
-        /// </summary>
         public static void Notification(string message)
         {
             int assignedRow;
 
             lock (LockObject)
             {
-                // 1. Save where the user is typing right now
                 int originalLeft = Console.CursorLeft;
                 int originalTop = Console.CursorTop;
 
-                // 2. Assign a rolling row number dynamically (0, 1, 2, 3, 4, then back to 0)
                 assignedRow = _nextNotificationLine;
                 _nextNotificationLine = (_nextNotificationLine + 1) % MaxNotificationRows;
 
                 int rightCorner = Console.WindowWidth - NotificationWidth;
 
-                // 3. Move cursor to assigned row, clear line, and print custom message
                 Console.SetCursorPosition(rightCorner, assignedRow);
-                Console.Write(new string(' ', NotificationWidth)); // Erase old text
+                Console.Write(new string(' ', NotificationWidth));
+                Console.SetCursorPosition(rightCorner, assignedRow);
 
-                Console.SetCursorPosition(rightCorner, assignedRow);
                 Console.ForegroundColor = ConsoleColor.Green;
-
-                //// Truncate message if it's too long for the notification area width
-                //string formattedMsg = message.Length > NotificationWidth - 2
-                //    ? message.Substring(0, NotificationWidth - 5) + "..."
-                //    : message;
-
                 Console.Write($"[{message}]");
-                Console.SetCursorPosition(originalLeft, originalTop);
                 Console.ResetColor();
+                Console.SetCursorPosition(originalLeft, originalTop);
             }
             StartClearTimer(assignedRow);
         }
@@ -103,7 +91,6 @@
                     int rightCorner = Console.WindowWidth - NotificationWidth;
                     Console.SetCursorPosition(rightCorner, rowToClear);
                     Console.Write(new string(' ', NotificationWidth));
-
                     Console.SetCursorPosition(originalLeft, originalTop);
                 }
                 timer.Dispose();
